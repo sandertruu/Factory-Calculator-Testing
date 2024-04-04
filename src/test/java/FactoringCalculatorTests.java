@@ -25,17 +25,24 @@ public class FactoringCalculatorTests {
     @Test
     public void testAutofilledCalculator(){
 
-        Assertions.assertNotEquals("", getInvoiceAmountValue());
-        Assertions.assertNotEquals("", getAdvanceRateValue());
-        Assertions.assertNotEquals("", getInterestRateValue());
-        Assertions.assertNotEquals("", getPaymentTermValue());
-        Assertions.assertNotEquals("", getCommmissionFeeValue());
+        Assertions.assertEquals("10000.0", getInvoiceAmountValue());
+        Assertions.assertEquals("90", getAdvanceRateValue());
+        Assertions.assertEquals("3.0", getInterestRateValue());
+        Assertions.assertEquals("30", getPaymentTermValue());
+        Assertions.assertEquals("0.3", getCommmissionFeeValue());
 
         clickCalculateButton();
 
 
         Assertions.assertEquals(0.53, getResultPercentage());
         Assertions.assertEquals(52.5, getResult());
+    }
+
+    @Test
+    public void testAcceptingInvoiceAmountValue(){
+        setInvoiceAmountValue(24500);
+        Assertions.assertEquals("24500.0", getInvoiceAmountValue());
+        Assertions.assertFalse(isErrorDisplayed());
     }
 
     @Test
@@ -81,11 +88,68 @@ public class FactoringCalculatorTests {
     }
 
     @Test
+    public void testLowerBoundaryInterestRateValue(){
+        setInterestRateValue(0);
+        Assertions.assertEquals("0.0", getInterestRateValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(0.3, getResultPercentage());
+        Assertions.assertEquals(30.0, getResult());
+    }
+
+    @Test
+    public void testUpperBoundaryInterestRateValue(){
+        setInterestRateValue(20);
+        Assertions.assertEquals("20.0", getInterestRateValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(1.8, getResultPercentage());
+        Assertions.assertEquals(180.0, getResult());
+    }
+
+    @Test
     public void testNegativeInterestRateValue(){
         setInterestRateValue(-1);
         Assertions.assertTrue(isErrorDisplayed());
         String message = getErrorMessage();
         Assertions.assertEquals("Value must be greater than or equal 0.", message);
+    }
+
+    @Test
+    public void testGreaterThanUpperBoundaryInterestRateValue(){
+        setInterestRateValue(21);
+        Assertions.assertTrue(isErrorDisplayed());
+        String message = getErrorMessage();
+        Assertions.assertEquals("Value must be less than or equal 20.", message);
+    }
+
+    @Test
+    public void testOneDecimalPointInterestRateValue(){
+        setInterestRateValue(3.1);
+        Assertions.assertEquals("3.1", getInterestRateValue());
+
+        Assertions.assertFalse(isErrorDisplayed());
+    }
+
+    @Test
+    public void testTwoDecimalPointInterestRateValue(){
+        setInterestRateValue(3.01);
+        Assertions.assertEquals("3.01", getInterestRateValue());
+
+        Assertions.assertFalse(isErrorDisplayed());
+    }
+
+    @Test
+    public void testMoreThanTwoDecimalPointInterestRateValue(){
+        setInterestRateValue(3.111);
+        Assertions.assertEquals("3.111", getInterestRateValue());
+
+        Assertions.assertTrue(isErrorDisplayed());
+        String message = getErrorMessage();
+
+        Assertions.assertEquals("Step should be 0.01, nearest values are 3.11 and 3.12.", message);
     }
 
 
