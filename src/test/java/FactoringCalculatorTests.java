@@ -45,6 +45,14 @@ public class FactoringCalculatorTests {
         Assertions.assertEquals(52.5, result);
     }
 
+    @Test
+    public void testNegativeInvoiceAmountValue(){
+        setInvoiceAmountValue(-10000);
+        Assertions.assertTrue(isErrorDisplayed());
+        String message = getErrorMessage();
+        Assertions.assertEquals("Value must be greater than or equal 1.", message);
+    }
+
 
     @AfterEach
     public void tearDown(){
@@ -115,5 +123,13 @@ public class FactoringCalculatorTests {
             $(".ui-cookie-consent__accept-button").click();
         }
 
+    }
+
+    public boolean isErrorDisplayed(){
+        return $("ui-hint[type='error']").isDisplayed();
+    }
+
+    public String getErrorMessage(){
+        return $("ui-hint[type='error']").getText();
     }
 }
