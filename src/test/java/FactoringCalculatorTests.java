@@ -4,8 +4,7 @@ import org.junit.jupiter.api.*;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.*;
 
 public class FactoringCalculatorTests {
     
@@ -18,31 +17,36 @@ public class FactoringCalculatorTests {
     @BeforeEach
     public void openBrowser(){
         open("https://www.swedbank.lt/business/finance/trade/factoring?language=ENG");
+        sleep(1000);
         dismissCookieMessage();
     }
 
 
     @Test
     public void testAutofilledCalculator(){
-        String invoiceAmountValue = getInvoiceAmountValue();
-        String advanceRateValue = getAdvanceRateValue();
-        String interestRateValue = getInterestRateValue();
-        String paymentTermValue = getPaymentTermValue();
-        String commmissionFeeValue = getCommmissionFeeValue();
 
-        Assertions.assertNotEquals("", invoiceAmountValue);
-        Assertions.assertNotEquals("", advanceRateValue);
-        Assertions.assertNotEquals("", interestRateValue);
-        Assertions.assertNotEquals("", paymentTermValue);
-        Assertions.assertNotEquals("", commmissionFeeValue);
+        Assertions.assertNotEquals("", getInvoiceAmountValue());
+        Assertions.assertNotEquals("", getAdvanceRateValue());
+        Assertions.assertNotEquals("", getInterestRateValue());
+        Assertions.assertNotEquals("", getPaymentTermValue());
+        Assertions.assertNotEquals("", getCommmissionFeeValue());
 
         clickCalculateButton();
 
-        double resultPercentage = getResultPercentage();
-        double result = getResult();
 
-        Assertions.assertEquals(0.53, resultPercentage);
-        Assertions.assertEquals(52.5, result);
+        Assertions.assertEquals(0.53, getResultPercentage());
+        Assertions.assertEquals(52.5, getResult());
+    }
+
+    @Test
+    public void testLowerBoundaryInvoiceAmountValue(){
+        setInvoiceAmountValue(1);
+        Assertions.assertEquals("1.0", getInvoiceAmountValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(0.52, getResultPercentage());
+        Assertions.assertEquals(0.01, getResult());
     }
 
     @Test
@@ -53,12 +57,46 @@ public class FactoringCalculatorTests {
         Assertions.assertEquals("Value must be greater than or equal 1.", message);
     }
 
-
-    @AfterEach
-    public void tearDown(){
-        Selenide.closeWebDriver();
+    @Test
+    public void testOneDecimalPointStepInvoiceAmountValue(){
+        setInvoiceAmountValue(10000.1);
+        Assertions.assertEquals("10000.1", getInvoiceAmountValue());
+        Assertions.assertFalse(isErrorDisplayed());
     }
 
+    @Test
+    public void testTwoDecimalPointStepInvoiceAmountValue(){
+        setInvoiceAmountValue(10000.01);
+        Assertions.assertEquals("10000.01", getInvoiceAmountValue());
+        Assertions.assertFalse(isErrorDisplayed());
+    }
+
+    @Test
+    public void testMoreThanTwoDecimalPointsInvoiceAmountValue(){
+        setInvoiceAmountValue(10000.0001);
+        Assertions.assertEquals("10000.0001", getInvoiceAmountValue());
+        Assertions.assertTrue(isErrorDisplayed());
+        String message = getErrorMessage();
+        Assertions.assertEquals("Step should be 0.01, nearest values are 10000.00 and 10000.01.", message);
+    }
+
+    @Test
+    public void testNegativeInterestRateValue(){
+        setInterestRateValue(-1);
+        Assertions.assertTrue(isErrorDisplayed());
+        String message = getErrorMessage();
+        Assertions.assertEquals("Value must be greater than or equal 0.", message);
+    }
+
+
+    @AfterEach
+    public void close(){
+        Selenide.closeWindow();
+    }
+    @AfterAll
+    public static void tearDown(){
+        Selenide.closeWebDriver();
+    }
     public String getInvoiceAmountValue(){
         String inputId = "D5";
         return $("#" + inputId).shouldBe(Condition.visible).getValue();
