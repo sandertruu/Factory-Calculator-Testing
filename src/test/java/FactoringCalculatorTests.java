@@ -25,9 +25,9 @@ public class FactoringCalculatorTests {
     @Test
     public void testAutofilledCalculator(){
 
-        Assertions.assertEquals("10000.0", getInvoiceAmountValue());
+        Assertions.assertEquals("10000", getInvoiceAmountValue());
         Assertions.assertEquals("90", getAdvanceRateValue());
-        Assertions.assertEquals("3.0", getInterestRateValue());
+        Assertions.assertEquals("3", getInterestRateValue());
         Assertions.assertEquals("30", getPaymentTermValue());
         Assertions.assertEquals("0.3", getCommmissionFeeValue());
 
@@ -151,6 +151,118 @@ public class FactoringCalculatorTests {
 
         Assertions.assertEquals("Step should be 0.01, nearest values are 3.11 and 3.12.", message);
     }
+
+    @Test
+    public void test90AdvanceRateValue(){
+        setAdvanceRateValue(90);
+        Assertions.assertEquals("90", getAdvanceRateValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(0.53, getResultPercentage());
+        Assertions.assertEquals(52.5, getResult());
+    }
+
+    @Test
+    public void test85AdvanceRateValue(){
+        setAdvanceRateValue(85);
+        Assertions.assertEquals("85", getAdvanceRateValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(0.51, getResultPercentage());
+        Assertions.assertEquals(51.25, getResult());
+    }
+
+    @Test
+    public void test80AdvanceRateValue(){
+        setAdvanceRateValue(80);
+        Assertions.assertEquals("80", getAdvanceRateValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(0.50, getResultPercentage());
+        Assertions.assertEquals(50.0, getResult());
+    }
+
+    @Test
+    public void test75AdvanceRateValue(){
+        setAdvanceRateValue(75);
+        Assertions.assertEquals("75", getAdvanceRateValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(0.49, getResultPercentage());
+        Assertions.assertEquals(48.75, getResult());
+    }
+
+    @Test
+    public void testNonOpitonalAdvanceRateValue(){
+        setAdvanceRateValue(100);
+        Assertions.assertEquals("100.0", getAdvanceRateValue());
+        Assertions.assertTrue(isErrorDisplayed());
+    }
+
+    @Test
+    public void test30PaymentTermValue(){
+        setPaymentTermValue(30);
+        Assertions.assertEquals("30", getPaymentTermValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(0.53, getResultPercentage());
+        Assertions.assertEquals(52.5, getResult());
+    }
+
+    @Test
+    public void test60PaymentTermValue(){
+        setPaymentTermValue(60);
+        Assertions.assertEquals("60", getPaymentTermValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(0.75, getResultPercentage());
+        Assertions.assertEquals(75.0, getResult());
+    }
+
+    @Test
+    public void test90PaymentTermValue(){
+        setPaymentTermValue(90);
+        Assertions.assertEquals("90", getPaymentTermValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(0.97, getResultPercentage());
+        Assertions.assertEquals(97.5, getResult());
+    }
+
+    @Test
+    public void test120PaymentTermValue(){
+        setPaymentTermValue(120);
+        Assertions.assertEquals("120", getPaymentTermValue());
+
+        clickCalculateButton();
+
+        Assertions.assertEquals(1.2, getResultPercentage());
+        Assertions.assertEquals(120.0, getResult());
+    }
+
+    @Test
+    public void testNonOptionalPaymentTermValue(){
+        setPaymentTermValue(70);
+        Assertions.assertEquals("70", getPaymentTermValue());
+        Assertions.assertTrue(isErrorDisplayed());
+    }
+
+    @Test
+    public void testAcceptingCommissionFeeValue(){
+        setCommissionFeeValue(1);
+        Assertions.assertEquals("1.0", getCommmissionFeeValue());
+        Assertions.assertFalse(isErrorDisplayed());
+    }
+
+    @Test
+
 
 
     @AfterEach
